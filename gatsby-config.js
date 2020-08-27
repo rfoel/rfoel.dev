@@ -6,7 +6,6 @@ module.exports = {
     siteUrl: `https://iceberg-gatsby-multilang.netlify.com/`,
   },
   plugins: [
-    `gatsby-plugin-netlify-cms`,
     `gatsby-plugin-styled-components`,
     `gatsby-transformer-json`,
     `gatsby-transformer-sharp`,
