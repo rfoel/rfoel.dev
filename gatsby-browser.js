@@ -1,6 +1,7 @@
-require('./src/stylesheets/prism.css')
-require('prismjs/plugins/line-numbers/prism-line-numbers.css')
+import 'lazysizes';
 
-exports.onInitialClientRender = () => {
-  require('typeface-inter')
-}
+require('prismjs/themes/prism-tomorrow.css');
+
+import CustomLayout from './wrapPageElement';
+
+export const wrapPageElement = CustomLayout;

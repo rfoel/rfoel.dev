@@ -1,65 +1,116 @@
 module.exports = {
   siteMetadata: {
-    title: `Rafael Franco`,
-    subtitle: `software engineer`,
-    description: `Rafael's personal website`,
-    author: `@rfoel`,
+    title: `Gatsby multiple language starter`,
+    description: `A simple but feature rich starter boilerplate for creating a multi-language Gatsby website (Internationalization / i18n) without third party plugins or packages and also focused on SEO. This starter also contains other main Gatsby configurations you might need.`,
+    author: `@diogorodrigues`,
+    siteUrl: `https://iceberg-gatsby-multilang.netlify.com/`,
   },
   plugins: [
-    `gatsby-plugin-react-helmet`,
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        name: `markdown-pages`,
-        path: `${__dirname}/src/content`,
-      },
-    },
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        name: `images`,
-        path: `${__dirname}/src/images`,
-      },
-    },
+    `gatsby-plugin-netlify-cms`,
+    `gatsby-plugin-styled-components`,
+    `gatsby-transformer-json`,
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
-    `gatsby-plugin-emotion`,
+    // It needs to be the first one to work with gatsby-remark-images
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/static/assets/img`,
+        name: `uploads`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/config/translations`,
+        name: `translations`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/config/menu`,
+        name: `menu`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/src/images`,
+        name: `images`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/blog`,
+        name: `blog`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/pages`,
+        name: `pages`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/config/language-mapping`,
+        name: `language-mapping`,
+      },
+    },
     {
       resolve: `gatsby-transformer-remark`,
       options: {
         plugins: [
-          `gatsby-remark-reading-time`,
           {
-            resolve: `gatsby-remark-prismjs`,
+            resolve: `gatsby-remark-relative-images`,
             options: {
-              aliases: { sh: 'bash', js: 'javascript' },
-              showLineNumbers: true,
+              name: `uploads`,
             },
           },
+          {
+            resolve: `gatsby-remark-images`,
+            options: {
+              maxWidth: 1040,
+              linkImagesToOriginal: false,
+            },
+          },
+          `gatsby-remark-lazy-load`,
+          `gatsby-remark-prismjs`, // It needs to be the last one
         ],
       },
     },
     {
-      resolve: `gatsby-plugin-manifest`,
+      resolve: `gatsby-plugin-prefetch-google-fonts`,
       options: {
-        name: `gatsby-starter-default`,
-        short_name: `starter`,
-        start_url: `/`,
-        background_color: `#000000`,
-        theme_color: `#000000`,
-        display: `minimal-ui`,
-        icon: `src/images/gatsby-icon.png`, // This path is relative to the root of the site.
+        fonts: [
+          {
+            family: `Open Sans`,
+            variants: [`400`, `600`],
+          },
+        ],
       },
     },
+
+    `gatsby-plugin-react-helmet`,
+    `gatsby-plugin-sitemap`,
     {
-      resolve: `gatsby-plugin-splitbee`,
+      resolve: `gatsby-plugin-manifest`,
       options: {
-        includeInDevelopment: false,
-        delayTimeout: 0,
+        name: `Gatsby multiple language`,
+        short_name: `Gatsby multiple language`,
+        start_url: `/`,
+        background_color: `#16202c`,
+        theme_color: `#16202c`,
+        display: `minimal-ui`,
+        icon: `src/images/gatsby-icon.png`,
       },
     },
     // this (optional) plugin enables Progressive Web App + Offline functionality
     // To learn more, visit: https://gatsby.dev/offline
-    // 'gatsby-plugin-offline',
+    `gatsby-plugin-offline`,
   ],
-}
+};
