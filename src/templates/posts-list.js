@@ -15,8 +15,7 @@ const Blog = props => {
   const { currentPage, numPages } = props.pageContext;
   const isFirst = currentPage === 1;
   const isLast = currentPage === numPages;
-  const prevPage =
-    currentPage - 1 === 1 ? '/blog' : `/blog/${currentPage - 1}`;
+  const prevPage = currentPage - 1 === 1 ? '/blog' : `/blog/${currentPage - 1}`;
   const nextPage = `/blog/page/${currentPage + 1}`;
 
   return (
@@ -28,14 +27,7 @@ const Blog = props => {
         {postList.map(
           ({
             node: {
-              frontmatter: {
-                background,
-                category,
-                date,
-                description,
-                title,
-                image,
-              },
+              frontmatter: { background, category, date, description, title, image },
               timeToRead,
               fields: { slug },
             },
@@ -85,7 +77,13 @@ export const query = graphql`
             description
             category
             background
-            image
+            image {
+              childImageSharp {
+                fluid(maxWidth: 800) {
+                  ...GatsbyImageSharpFluid
+                }
+              }
+            }
             date(formatString: $dateFormat)
 
           }

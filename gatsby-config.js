@@ -10,14 +10,6 @@ module.exports = {
     `gatsby-transformer-json`,
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
-    // It needs to be the first one to work with gatsby-remark-images
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        path: `${__dirname}/static/assets/img`,
-        name: `uploads`,
-      },
-    },
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -64,19 +56,6 @@ module.exports = {
       resolve: `gatsby-transformer-remark`,
       options: {
         plugins: [
-          {
-            resolve: `gatsby-remark-relative-images`,
-            options: {
-              name: `uploads`,
-            },
-          },
-          {
-            resolve: `gatsby-remark-images`,
-            options: {
-              maxWidth: 1040,
-              linkImagesToOriginal: false,
-            },
-          },
           `gatsby-remark-lazy-load`,
           `gatsby-remark-prismjs`, // It needs to be the last one
         ],

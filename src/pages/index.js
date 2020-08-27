@@ -11,13 +11,7 @@ import * as S from '../components/ListWrapper/styled';
 const Index = ({ data: { allMarkdownRemark } }) => {
   // useTranslations is aware of the global context (and therefore also "locale")
   // so it'll automatically give back the right translations
-  const {
-    hello,
-    subline,
-    category,
-    latestPosts,
-    allPosts,
-  } = useTranslations();
+  const { hello, subline, category, latestPosts, allPosts } = useTranslations();
 
   const postList = allMarkdownRemark.edges;
 
@@ -37,30 +31,23 @@ const Index = ({ data: { allMarkdownRemark } }) => {
         {postList.map(
           ({
             node: {
-              frontmatter: {
-                background,
-                category,
-                date,
-                description,
-                title,
-                image,
-              },
+              frontmatter: { background, category, date, description, title, image },
               timeToRead,
               fields: { slug },
             },
           }) => (
-              <PostItem
-                slug={`/blog/${slug}`}
-                background={background}
-                category={category}
-                date={date}
-                timeToRead={timeToRead}
-                title={title}
-                description={description}
-                image={image}
-                key={slug}
-              />
-            ),
+            <PostItem
+              slug={`/blog/${slug}`}
+              background={background}
+              category={category}
+              date={date}
+              timeToRead={timeToRead}
+              title={title}
+              description={description}
+              image={image}
+              key={slug}
+            />
+          ),
         )}
       </S.ListWrapper>
 
@@ -90,7 +77,13 @@ export const query = graphql`
             description
             category
             background
-            image
+            image {
+              childImageSharp {
+                fluid(maxWidth: 800) {
+                  ...GatsbyImageSharpFluid
+                }
+              }
+            }
             date(formatString: $dateFormat)
 
           }

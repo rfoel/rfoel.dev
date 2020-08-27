@@ -7,7 +7,7 @@ import * as S from '../components/Content/styled';
 
 const Post = props => {
   const post = props.data.markdownRemark;
-
+  console.log(post.frontmatter.image);
   return (
     <>
       <SEO
@@ -25,14 +25,17 @@ const Post = props => {
 
 export const query = graphql`
   query Post($locale: String!, $title: String!) {
-    markdownRemark(
-      frontmatter: { title: { eq: $title } }
-      fields: { locale: { eq: $locale } }
-    ) {
+    markdownRemark(frontmatter: { title: { eq: $title } }, fields: { locale: { eq: $locale } }) {
       frontmatter {
         title
         description
-        image
+        image {
+          childImageSharp {
+            fluid(maxWidth: 800) {
+              ...GatsbyImageSharpFluid
+            }
+          }
+        }
       }
       html
     }
