@@ -1,29 +1,6 @@
-import React from 'react';
-import { useStaticQuery, graphql } from 'gatsby';
-import { useLocale } from '../hooks/locale';
-
-function useTranslations() {
-  // Grab the locale (passed through context) from the Locale Provider
-  // through useLocale() hook
-  const { locale } = useLocale();
-  // Query the JSON files in <rootDir>/i18n/translations
-  const { rawData } = useStaticQuery(query);
-
-  // Simplify the response from GraphQL
-  const simplified = rawData.edges.map(item => {
-    return {
-      name: item.node.name,
-      translations: item.node.translations,
-    };
-  });
-
-  // Only return translations for the current locale
-  const { translations } = simplified.filter(lang => lang.name === locale)[0];
-
-  return translations;
-}
-
-export default useTranslations;
+import React from 'react'
+import { useStaticQuery, graphql } from 'gatsby'
+import { useLocale } from '../hooks/locale'
 
 const query = graphql`
   query useTranslations {
@@ -55,4 +32,22 @@ const query = graphql`
       }
     }
   }
-`;
+`
+
+const useTranslations = () => {
+  const { locale } = useLocale()
+  const { rawData } = useStaticQuery(query)
+
+  const simplified = rawData.edges.map(item => {
+    return {
+      name: item.node.name,
+      translations: item.node.translations,
+    }
+  })
+
+  const [{ translations }] = simplified.filter(lang => lang.name === locale)
+
+  return translations
+}
+
+export default useTranslations

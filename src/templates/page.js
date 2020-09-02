@@ -1,12 +1,12 @@
-import React from 'react';
-import { graphql } from 'gatsby';
-import TitlePage from '../components/TitlePage';
-import SEO from '../components/seo';
+import React from 'react'
+import { graphql } from 'gatsby'
+import TitlePage from '../components/TitlePage'
+import SEO from '../components/SEO'
 
-import * as S from '../components/Content/styled';
+import { Content } from '../components/Content'
 
 const Page = props => {
-  const post = props.data.markdownRemark;
+  const post = props.data.markdownRemark
 
   return (
     <>
@@ -16,12 +16,12 @@ const Page = props => {
         image={post.frontmatter.image}
       />
       <TitlePage text={post.frontmatter.title} />
-      <S.Content>
+      <Content>
         <div dangerouslySetInnerHTML={{ __html: post.html }}></div>
-      </S.Content>
+      </Content>
     </>
-  );
-};
+  )
+}
 
 export const query = graphql`
   query Page($locale: String!, $title: String!) {
@@ -40,6 +40,6 @@ export const query = graphql`
       html
     }
   }
-`;
+`
 
-export default Page;
+export default Page

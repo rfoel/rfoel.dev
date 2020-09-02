@@ -4,7 +4,7 @@ import useTranslations from '../useTranslations';
 
 import * as S from './styled';
 
-const PostItem = ({ slug, background, category, date, timeToRead, title, description, image }) => {
+const PostItem = ({ slug, date, timeToRead, title, description, image }) => {
   const { toRead } = useTranslations();
 
   return (
@@ -25,8 +25,6 @@ const PostItem = ({ slug, background, category, date, timeToRead, title, descrip
 
 PostItem.propTypes = {
   slug: PropTypes.string.isRequired,
-  background: PropTypes.string,
-  category: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   timeToRead: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,

@@ -2,8 +2,6 @@
 title: 'Exemplos de Markdown'
 date: '2019-03-22 01:21:23'
 description: O Markdown deve ser o mais fácil de ler e escrever o mais possível.
-category: Markdown
-background: '#353b48'
 image: './images/markdown-examples.jpg'
 imageCredit: 'Foto por [Mohamed Ziyaadh](https://unsplash.com/photos/hL4Eqvmhco8) no [Unsplash](https://unsplash.com)'
 ---

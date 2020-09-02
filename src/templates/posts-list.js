@@ -1,22 +1,21 @@
-import React from 'react';
-import { graphql } from 'gatsby';
-import PostItem from '../components/PostItem';
-import TitlePage from '../components/TitlePage';
-import SEO from '../components/seo';
+import React from 'react'
+import { graphql } from 'gatsby'
+import PostItem from '../components/PostItem'
+import TitlePage from '../components/TitlePage'
+import SEO from '../components/SEO'
 
-import Pagination from '../components/Pagination';
+import Pagination from '../components/Pagination'
 
-import * as S from '../components/ListWrapper/styled';
+import * as S from '../components/ListWrapper/styled'
 
 const Blog = props => {
-  const postList = props.data.allMarkdownRemark.edges;
+  const postList = props.data.allMarkdownRemark.edges
 
-  // Logic for Pagination Component
-  const { currentPage, numPages } = props.pageContext;
-  const isFirst = currentPage === 1;
-  const isLast = currentPage === numPages;
-  const prevPage = currentPage - 1 === 1 ? '/blog' : `/blog/${currentPage - 1}`;
-  const nextPage = `/blog/page/${currentPage + 1}`;
+  const { currentPage, numPages } = props.pageContext
+  const isFirst = currentPage === 1
+  const isLast = currentPage === numPages
+  const prevPage = currentPage - 1 === 1 ? '/blog' : `/blog/${currentPage - 1}`
+  const nextPage = `/blog/page/${currentPage + 1}`
 
   return (
     <>
@@ -27,15 +26,13 @@ const Blog = props => {
         {postList.map(
           ({
             node: {
-              frontmatter: { background, category, date, description, title, image },
+              frontmatter: { date, description, title, image },
               timeToRead,
               fields: { slug },
             },
           }) => (
             <PostItem
               slug={`/blog/${slug}`}
-              background={background}
-              category={category}
               date={date}
               timeToRead={timeToRead}
               title={title}
@@ -56,8 +53,8 @@ const Blog = props => {
         nextPage={nextPage}
       />
     </>
-  );
-};
+  )
+}
 
 export const query = graphql`
   query PostsList($locale: String!, $dateFormat: String!, $skip: Int!, $limit: Int!) {
@@ -75,8 +72,6 @@ export const query = graphql`
           frontmatter {
             title
             description
-            category
-            background
             image {
               childImageSharp {
                 fluid(maxWidth: 800) {
@@ -96,6 +91,6 @@ export const query = graphql`
       }
     }
   }
-`;
+`
 
-export default Blog;
+export default Blog

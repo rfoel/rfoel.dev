@@ -1,27 +1,31 @@
-import React from 'react';
-import { graphql } from 'gatsby';
-import TitlePage from '../components/TitlePage';
-import SEO from '../components/seo';
+import React from 'react'
+import { graphql } from 'gatsby'
+import Markdown from 'react-markdown'
+import TitlePage from '../components/TitlePage'
+import SEO from '../components/SEO'
 
-import * as S from '../components/Content/styled';
+import { Content, Image } from '../components/Content'
 
-const Post = props => {
-  const post = props.data.markdownRemark;
-  console.log(post.frontmatter.image);
+const Post = ({ data: { markdownRemark } }) => {
+  const {
+    frontmatter: { description, image, imageCredit, title },
+    html,
+  } = markdownRemark
+
+  console.log(imageCredit)
+
   return (
     <>
-      <SEO
-        title={post.frontmatter.title}
-        description={post.frontmatter.description}
-        image={post.frontmatter.image}
-      />
-      <TitlePage text={post.frontmatter.title} />
-      <S.Content>
-        <div dangerouslySetInnerHTML={{ __html: post.html }}></div>
-      </S.Content>
+      <SEO title={title} description={description} image={image} />
+      <TitlePage text={title} />
+      {image && <Image fluid={image.childImageSharp.fluid} alt={title} />}
+      {imageCredit && <Markdown>{imageCredit}</Markdown>}
+      <Content>
+        <div dangerouslySetInnerHTML={{ __html: html }}></div>
+      </Content>
     </>
-  );
-};
+  )
+}
 
 export const query = graphql`
   query Post($locale: String!, $title: String!) {
@@ -36,10 +40,11 @@ export const query = graphql`
             }
           }
         }
+        imageCredit
       }
       html
     }
   }
-`;
+`
 
-export default Post;
+export default Post
