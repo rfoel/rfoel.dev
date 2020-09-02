@@ -5,6 +5,7 @@ description: O Markdown deve ser o mais fácil de ler e escrever o mais possíve
 category: Markdown
 background: '#353b48'
 image: './images/markdown-examples.jpg'
+imageCredit: 'Foto por [Mohamed Ziyaadh](https://unsplash.com/photos/hL4Eqvmhco8) no [Unsplash](https://unsplash.com)'
 ---
 
 O Markdown deve ser o mais fácil de ler e escrever o mais possível.

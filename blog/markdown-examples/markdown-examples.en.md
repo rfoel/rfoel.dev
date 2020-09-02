@@ -5,8 +5,7 @@ description: Markdown is intended to be as easy-to-read and easy-to-write as is 
 category: Markdown
 background: '#353b48'
 image: './images/markdown-examples.jpg'
-imageCredit: 'Photo by [Mohamed Ziyaadh](https://unsplash.com/photos/hL4Eqvmhco8) on
-  [Unsplash](https://unsplash.com)'
+imageCredit: 'Photo by [Mohamed Ziyaadh](https://unsplash.com/photos/hL4Eqvmhco8) on [Unsplash](https://unsplash.com)'
 ---
 
 Markdown is intended to be as easy-to-read and easy-to-write as is feasible.

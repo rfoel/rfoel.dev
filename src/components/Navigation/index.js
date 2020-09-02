@@ -17,14 +17,10 @@ const Navigation = ({ isActive, handleToggleMenu }) => {
             aria-label={menu.name}
             activeClassName="active"
             key={`${menu.link}${index}`}
-            >
+          >
             {menu.name}
           </S.NavigationLink>
         ))}
-
-        <S.NavigationButton to="" aria-label="Login">
-          {button}
-        </S.NavigationButton>
       </S.Navigation>
     </>
   );

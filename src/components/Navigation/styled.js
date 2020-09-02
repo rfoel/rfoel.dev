@@ -26,36 +26,7 @@ export const NavigationLink = styled(LocalizedLink)`
   `}
   ${media.greaterThan('large')`
     margin-left: var(--space);
-  `} 
-
-  &:after {
-    ${media.greaterThan('medium')`
-      content: '';
-      display: inline-block;
-      width: 0;
-      height: 4px;
-      background: var(--primary-color);
-      position: absolute;
-      left: 0;
-      bottom: -10px;
-      opacity: 0;
-      transition: .3s ease-in-out;
-    `}
-  }
-
-  &:hover,
-  &.active {
-    font-weight: bold;
-    ${media.greaterThan('medium')`
-      font-weight: normal;
-    `}
-
-    &:after {
-      opacity: 1;
-      bottom: -10px;
-      width: 100%;
-    }
-  }
+  `}
 `;
 
 export const NavigationButton = styled(Link)`

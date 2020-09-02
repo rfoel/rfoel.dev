@@ -3,7 +3,7 @@ import { useStaticQuery, graphql } from 'gatsby';
 import { useLocale } from '../hooks/locale';
 
 function useTranslations() {
-  // Grab the locale (passed through context) from the Locale Provider 
+  // Grab the locale (passed through context) from the Locale Provider
   // through useLocale() hook
   const { locale } = useLocale();
   // Query the JSON files in <rootDir>/i18n/translations
@@ -18,9 +18,7 @@ function useTranslations() {
   });
 
   // Only return translations for the current locale
-  const { translations } = simplified.filter(
-    lang => lang.name === locale,
-  )[0];
+  const { translations } = simplified.filter(lang => lang.name === locale)[0];
 
   return translations;
 }
@@ -29,9 +27,7 @@ export default useTranslations;
 
 const query = graphql`
   query useTranslations {
-    rawData: allFile(
-      filter: { sourceInstanceName: { eq: "translations" } }
-    ) {
+    rawData: allFile(filter: { sourceInstanceName: { eq: "translations" } }) {
       edges {
         node {
           name
@@ -41,7 +37,6 @@ const query = graphql`
             hello
             subline
             latestPosts
-            category
             allPosts
             toRead
 

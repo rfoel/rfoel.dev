@@ -12,7 +12,6 @@ const PostItem = ({ slug, background, category, date, timeToRead, title, descrip
       <S.PostItemWrapper>
         {image && <S.PostItemImg fluid={image.childImageSharp.fluid} alt={title} />}
         <S.PostItemInfo>
-          <S.PostItemTag background={background}>{category}</S.PostItemTag>
           <S.PostItemDate>
             {date} • {timeToRead} min {toRead}
           </S.PostItemDate>
