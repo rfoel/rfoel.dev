@@ -5,6 +5,14 @@ import type { PostMeta } from "./types.ts";
 // Mais novo primeiro; no mesmo dia, vale a ordem da lista
 export const POSTS: PostMeta[] = [
   {
+    slug: "deploy-github-actions-oidc",
+    date: "2026-11-26",
+    project: "rfoel",
+    title: "Deploy na AWS pelo GitHub Actions sem nenhuma chave: OIDC com SST",
+    description:
+      "Como o rfoel.dev passou a ir para produção a cada push na main: o GitHub Actions troca um token OIDC por credenciais temporárias da AWS, num papel que só confia no environment de produção.",
+  },
+  {
     slug: "fairer-conveyor",
     date: "2026-11-26",
     project: "kaitenmate",
