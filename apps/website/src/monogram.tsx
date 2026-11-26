@@ -164,6 +164,8 @@ export function Monogram({ className }: { className?: string }) {
       pointer.x = pointer.y = -1e4;
     };
     // No toque, o "cursor" some quando o dedo sai da tela
+    // Clique duplo ou triplo no R não pode selecionar o texto ao lado
+    const noSelect = (event: MouseEvent) => event.preventDefault();
     const onUp = (event: PointerEvent) => {
       if (event.pointerType !== "mouse") onLeave();
     };
@@ -212,6 +214,7 @@ export function Monogram({ className }: { className?: string }) {
       addEventListener("pointercancel", onUp);
       document.documentElement.addEventListener("pointerleave", onLeave);
       wrap.addEventListener("pointerdown", onDown);
+      wrap.addEventListener("mousedown", noSelect);
     }
 
     return () => {
@@ -224,11 +227,15 @@ export function Monogram({ className }: { className?: string }) {
       removeEventListener("pointercancel", onUp);
       document.documentElement.removeEventListener("pointerleave", onLeave);
       wrap.removeEventListener("pointerdown", onDown);
+      wrap.removeEventListener("mousedown", noSelect);
     };
   }, []);
 
   return (
-    <div ref={wrapRef} className={`relative aspect-square cursor-crosshair ${className ?? ""}`}>
+    <div
+      ref={wrapRef}
+      className={`relative aspect-square cursor-crosshair touch-manipulation select-none [-webkit-touch-callout:none] ${className ?? ""}`}
+    >
       <svg
         aria-hidden
         viewBox="7.57 6.07 241.86 241.86"

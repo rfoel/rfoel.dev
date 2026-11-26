@@ -49,7 +49,7 @@ export function Contact() {
           <button
             type="button"
             onClick={() => setState({ status: "idle" })}
-            className="rounded-full px-5 py-2.5 text-sm font-medium ring-1 ring-(--line) transition hover:ring-(--muted)"
+            className="rounded-full select-none px-5 py-2.5 text-sm font-medium ring-1 ring-(--line) transition hover:ring-(--muted)"
           >
             Escrever outra
           </button>
@@ -85,7 +85,7 @@ export function Contact() {
             <button
               type="submit"
               disabled={state.status === "sending"}
-              className="rounded-full bg-(--fg) px-6 py-3 text-sm font-medium text-(--bg) transition hover:opacity-85 disabled:opacity-60"
+              className="rounded-full select-none bg-(--fg) px-6 py-3 text-sm font-medium text-(--bg) transition hover:opacity-85 disabled:opacity-60"
             >
               {state.status === "sending" ? "Enviando…" : "Enviar mensagem"}
             </button>

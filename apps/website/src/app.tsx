@@ -39,26 +39,26 @@ export function App() {
           <div className="mt-10 flex flex-wrap gap-3">
             <a
               href="#projetos"
-              className="rounded-full bg-(--fg) px-5 py-2.5 text-sm font-medium text-(--bg) transition hover:opacity-85"
+              className="rounded-full select-none bg-(--fg) px-5 py-2.5 text-sm font-medium text-(--bg) transition hover:opacity-85"
             >
               Ver trabalhos ↓
             </a>
             <a
               href="#contato"
-              className="rounded-full px-5 py-2.5 text-sm font-medium ring-1 ring-(--line) transition hover:ring-(--muted)"
+              className="rounded-full select-none px-5 py-2.5 text-sm font-medium ring-1 ring-(--line) transition hover:ring-(--muted)"
             >
               Contato
             </a>
             <a
               href="/blog/"
-              className="rounded-full px-5 py-2.5 text-sm font-medium ring-1 ring-(--line) transition hover:ring-(--muted)"
+              className="rounded-full select-none px-5 py-2.5 text-sm font-medium ring-1 ring-(--line) transition hover:ring-(--muted)"
             >
               Blog
             </a>
             <a
               href="https://github.com/rfoel"
               onClick={() => track("github_aberto", { origem: "topo" })}
-              className="rounded-full px-5 py-2.5 text-sm font-medium ring-1 ring-(--line) transition hover:ring-(--muted)"
+              className="rounded-full select-none px-5 py-2.5 text-sm font-medium ring-1 ring-(--line) transition hover:ring-(--muted)"
             >
               GitHub ↗
             </a>
