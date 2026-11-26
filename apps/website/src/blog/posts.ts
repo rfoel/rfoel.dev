@@ -8,9 +8,9 @@ export const POSTS: PostMeta[] = [
     slug: "deploy-github-actions-oidc",
     date: "2026-11-26",
     project: "rfoel",
-    title: "Deploy na AWS pelo GitHub Actions sem nenhuma chave: OIDC com SST",
+    title: "Deploy na AWS pelo GitHub Actions com OIDC, sem nenhuma chave",
     description:
-      "Como o rfoel.dev passou a ir para produção a cada push na main: o GitHub Actions troca um token OIDC por credenciais temporárias da AWS, num papel que só confia no environment de produção.",
+      "Passo a passo para o GitHub Actions fazer deploy na AWS sem access key: o provedor OIDC, o papel que só confia no environment de produção, o sujeito imutável e o workflow. Com exemplos em SST.",
   },
   {
     slug: "fairer-conveyor",

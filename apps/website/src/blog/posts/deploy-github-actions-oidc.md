@@ -1,31 +1,39 @@
-Até pouco tempo, o deploy do rfoel.dev era um `sst deploy` rodado da minha máquina, com o perfil da AWS que vive no meu `~/.aws`. Funciona, mas depende de mim: de eu lembrar, de estar no computador certo e de a branch local estar igual à `main`.
+O jeito mais comum de dar acesso à AWS para um CI ainda é criar um usuário no IAM, gerar uma access key e guardar no GitHub como secret. Essa chave não expira. Se ela vazar num log, num fork ou num print, quem pegar tem acesso à conta até alguém perceber e revogar. E alguém precisa lembrar de trocar a chave de tempos em tempos.
 
-Agora cada push na `main` vai para produção sozinho, pelo GitHub Actions. E nenhuma chave da AWS foi parar no GitHub. Quem faz isso é o OIDC.
+Com OIDC, essa chave não existe. O GitHub Actions prova para a AWS de onde o job vem, e a AWS devolve credenciais que valem uma hora. Este post mostra o caminho inteiro, com os exemplos em [SST](https://sst.dev), mas a ideia é a mesma no Terraform, no CDK ou no console.
 
-## O problema das chaves
+## Como funciona
 
-O jeito antigo de dar acesso à AWS para um CI é criar um usuário no IAM, gerar uma access key e guardar no GitHub como secret. Essa chave não expira. Se ela vazar num log, num fork ou num print, quem pegar tem acesso à conta até alguém perceber e revogar. E alguém precisa lembrar de trocar a chave de tempos em tempos.
-
-## Como o OIDC resolve
-
-Com OIDC, a chave não existe. A troca acontece em cada execução:
-
-1. O GitHub Actions gera um token assinado para o job, que diz de onde ele vem: qual repositório, qual branch, qual environment.
-2. A AWS confia no emissor desses tokens (`token.actions.githubusercontent.com`), cadastrado uma vez na conta como provedor OIDC.
-3. O job pede para assumir um papel do IAM mostrando esse token. A AWS confere a assinatura e as condições do papel e devolve credenciais temporárias, que valem uma hora.
+1. O GitHub Actions gera um token assinado para cada job. O token diz de onde ele vem: qual repositório, qual branch, qual environment.
+2. A AWS confia no emissor desses tokens (`token.actions.githubusercontent.com`), cadastrado na conta como provedor OIDC.
+3. O job pede para assumir um papel do IAM mostrando o token. A AWS confere a assinatura e as condições do papel e devolve credenciais temporárias.
 
 Quem decide se o job entra é a política de confiança do papel. É ali que a segurança mora.
 
-## O papel, no próprio sst.config.ts
+## 1. O provedor OIDC
 
-O papel de deploy é criado pelo próprio SST, junto com o site, só no stage de produção:
+O provedor é um só por conta da AWS. O primeiro projeto que precisar cria:
 
 ```ts
-// O provedor OIDC do GitHub já existe na conta (criado por outro projeto), então só é procurado.
+const github = new aws.iam.OpenIdConnectProvider("GithubActions", {
+  url: "https://token.actions.githubusercontent.com",
+  clientIdLists: ["sts.amazonaws.com"],
+});
+```
+
+Os outros projetos da mesma conta só procuram o que já existe. Se cada um tentasse criar o seu, o segundo deploy falharia, porque a URL já está cadastrada:
+
+```ts
 const github = aws.iam.getOpenIdConnectProviderOutput({
   url: "https://token.actions.githubusercontent.com",
 });
+```
 
+## 2. O papel e a política de confiança
+
+O papel diz quem pode assumi-lo. No SST, dá para criar ele junto com o app, só no stage de produção:
+
+```ts
 const deployRole = new aws.iam.Role("DeployRole", {
   maxSessionDuration: 3600,
   assumeRolePolicy: github.arn.apply((arn) =>
@@ -40,7 +48,7 @@ const deployRole = new aws.iam.Role("DeployRole", {
             StringEquals: {
               "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
               "token.actions.githubusercontent.com:sub":
-                "repo:rfoel@19496473/rfoel.dev@1185670554:environment:production",
+                "repo:minha-org@123456/meu-app@987654321:environment:production",
             },
           },
         },
@@ -55,47 +63,49 @@ new aws.iam.RolePolicyAttachment("DeployAdmin", {
 });
 ```
 
-Três detalhes importam aqui.
+As duas condições fazem coisas diferentes. O `aud` garante que o token foi pedido para a AWS, e não para outro serviço. O `sub` diz exatamente qual job pode entrar.
 
-**O provedor OIDC é um só por conta.** Ele foi criado uma vez, pelo primeiro projeto que fez isso (o saci.cc). Os outros só procuram o que já existe com `getOpenIdConnectProviderOutput`. Se cada projeto tentasse criar o seu, o segundo deploy falharia.
+**Sobre o `AdministratorAccess`.** Parece muito, mas uma ferramenta como o SST cria e muda todo tipo de recurso, inclusive papéis do IAM. Uma política mais apertada teria que ser ajustada a cada tipo de recurso novo no projeto. Se o seu deploy mexe em pouca coisa, prefira uma política só com o que ele usa. Se não, a proteção fica na confiança: o papel pode muito, mas só um job muito específico consegue assumi-lo.
 
-**O papel tem `AdministratorAccess`.** Parece muito, mas o SST cria e muda todo tipo de recurso, inclusive papéis do IAM, e uma política mais apertada teria que ser ajustada a cada tipo de recurso novo no projeto. A proteção não está no que o papel pode fazer, e sim em quem pode assumir: só jobs que rodam no environment `production` deste repositório.
+## 3. O sujeito (sub)
 
-**O `sub` usa os ids numéricos.** O formato padrão do GitHub seria `repo:rfoel/rfoel.dev:environment:production`, com nomes. Se eu renomeasse a conta ou apagasse o repositório, outra pessoa poderia criar um com o mesmo nome e passar na condição. Com o sujeito imutável, o `sub` leva o id do dono e do repositório, que nunca são reaproveitados. Isso se liga por repositório:
+O `sub` padrão do GitHub usa nomes: `repo:minha-org/meu-app:environment:production`. O problema é que nomes mudam. Se a organização for renomeada ou o repositório apagado, outra pessoa pode criar um com o mesmo nome, e o token dela passaria na condição.
+
+O GitHub tem um formato imutável, que leva o id numérico do dono e do repositório: `repo:minha-org@123456/meu-app@987654321:environment:production`. Esses ids nunca são reaproveitados. Ele se liga por repositório:
 
 ```sh
-gh api -X PUT repos/rfoel/rfoel.dev/actions/oidc/customization/sub \
+gh api -X PUT repos/minha-org/meu-app/actions/oidc/customization/sub \
   -F use_default=true -F use_immutable_subject=true
 ```
 
-## O environment de produção
+A resposta mostra o prefixo do sujeito com os ids. É ele que vai na política do papel, seguido de `:environment:production`.
 
-A condição fala em `environment:production`, então o job precisa rodar num environment com esse nome. No GitHub, eu criei o environment e deixei só a `main` fazer deploy nele:
+## 4. O environment de produção
+
+Com environment no `sub`, o job precisa rodar num environment com esse nome. Crie o environment no GitHub e deixe só a `main` fazer deploy nele:
 
 ```sh
-gh api -X PUT repos/rfoel/rfoel.dev/environments/production \
+gh api -X PUT repos/minha-org/meu-app/environments/production \
   --input - <<< '{"deployment_branch_policy": {"protected_branches": false, "custom_branch_policies": true}}'
 
-gh api -X POST repos/rfoel/rfoel.dev/environments/production/deployment-branch-policies \
+gh api -X POST repos/minha-org/meu-app/environments/production/deployment-branch-policies \
   -f name=main -f type=branch
 ```
 
-Com isso, um job de outra branch nem chega a receber um token com esse `sub`. Um pull request de fora não tem como fazer deploy.
+Um job de outra branch não roda nesse environment, então não chega a ter um token com esse `sub`. Um pull request não tem como fazer deploy.
 
-## O workflow
+## 5. O workflow
 
-São dois jobs. O primeiro confere formato, lint, tipos e build. O segundo só roda se o primeiro passar:
+Um job de deploy que só roda depois dos testes:
 
 ```yaml
 deploy:
-  name: Deploy de produção
   needs: check
-  # Desligado até existir a variável AWS_DEPLOY_ROLE: o DeployRole sai do primeiro deploy feito à mão
+  # Desligado até existir a variável AWS_DEPLOY_ROLE (ver o passo 6)
   if: vars.AWS_DEPLOY_ROLE != ''
   runs-on: ubuntu-latest
-  timeout-minutes: 30
   environment: production
-  # Um deploy por vez; um push mais novo espera em vez de cancelar um pela metade
+  # Um deploy por vez: um push mais novo espera em vez de cancelar um pela metade
   concurrency:
     group: deploy-production
     cancel-in-progress: false
@@ -104,53 +114,45 @@ deploy:
     contents: read
   steps:
     - uses: actions/checkout@v5
-    - uses: voidzero-dev/setup-vp@v1
-      with:
-        cache: true
     - uses: aws-actions/configure-aws-credentials@v6
       with:
         role-to-assume: ${{ vars.AWS_DEPLOY_ROLE }}
         aws-region: us-east-1
-    - run: vp exec sst deploy --stage production
+    - run: npx sst deploy --stage production
 ```
 
-O `id-token: write` é o que deixa o job pedir o token OIDC. Sem ele, o `configure-aws-credentials` não tem o que trocar. O `concurrency` com `cancel-in-progress: false` evita que dois pushes seguidos façam deploy ao mesmo tempo, ou que um cancele o outro no meio de uma mudança de infraestrutura.
+Três linhas importam aqui. O `environment: production` é o que põe o environment no `sub` do token. O `id-token: write` deixa o job pedir o token; sem ele, o `configure-aws-credentials` não tem o que trocar. E o `concurrency` com `cancel-in-progress: false` impede que dois pushes seguidos façam deploy ao mesmo tempo, ou que um cancele o outro no meio de uma mudança de infraestrutura.
 
-## O ovo e a galinha
+A região do `aws-region` precisa ser a mesma em que o app já vive. Vale fixar a região também na config do projeto, para o deploy da sua máquina e o do CI caírem sempre no mesmo lugar.
 
-O papel é criado pelo `sst deploy`, mas o CI precisa do papel para rodar o `sst deploy`. Então o primeiro deploy com o papel é feito à mão, da minha máquina. O SST imprime o ARN no fim:
+## 6. O primeiro deploy
 
-```
-deployRole: arn:aws:iam::123456789012:role/DeployRole-dd09024
-```
-
-Esse ARN vira uma variável do repositório, e o job de deploy liga sozinho:
-
-```sh
-gh variable set AWS_DEPLOY_ROLE --body "arn:aws:iam::123456789012:role/DeployRole-dd09024"
-```
-
-O `if: vars.AWS_DEPLOY_ROLE != ''` existe por isso: enquanto a variável não existe, o workflow roda só o check, sem falhar no deploy.
-
-## Onde eu tropecei
-
-**A região.** O app estava na AWS desde o primeiro deploy, em `us-east-1`. Mas o `sst.config.ts` não dizia a região: ela vinha do meu perfil local. Meus outros projetos usam `sa-east-1`. Se o CI fizesse deploy em outra região, o SST não acharia o estado do app e tentaria criar tudo do zero, brigando pelo mesmo domínio. A região passou a ficar fixa na config:
+Se o papel é criado pelo próprio deploy, o CI não tem como fazer o primeiro. Então o primeiro é à mão, com as suas credenciais, e a ferramenta mostra o ARN do papel no fim. No SST, basta devolver ele no `run`:
 
 ```ts
-providers: {
-  // no GitHub Actions as credenciais vêm do OIDC (DeployRole), não do perfil
-  aws: {
-    version: "7.20.0",
-    region: "us-east-1" as const,
-    profile: process.env.GITHUB_ACTIONS ? undefined : "default",
-  },
-},
+return { deployRole: deployRole.arn };
 ```
 
-Antes de qualquer deploy, rodei `sst diff --stage production`. Ele mostra o que mudaria sem mudar nada, e a lista tinha só o `DeployRole`, a política dele e os arquivos do site. Nada de CloudFront ou bucket sendo recriado.
+Esse ARN vira uma variável do repositório:
 
-**Os tipos do SST no check.** O `vp check` do CI confere os tipos do `sst.config.ts`, e esses tipos só existem depois que o SST instala os providers. No CI, um `vp exec sst install` antes do check resolve. Com os tipos no lugar, apareceu um erro que estava escondido: nesta versão do SST, um provider com opções precisa de `version`. Fixei na mesma versão que o app já usava, a `7.20.0`, para o deploy não atualizar nada sem eu pedir.
+```sh
+gh variable set AWS_DEPLOY_ROLE --repo minha-org/meu-app \
+  --body "arn:aws:iam::123456789012:role/DeployRole-abc1234"
+```
 
-## O resultado
+O `if: vars.AWS_DEPLOY_ROLE != ''` do workflow existe por isso: enquanto a variável não existe, o deploy fica desligado em vez de falhar. A partir dela, cada push na `main` vai para produção.
 
-Agora o caminho é: commit, push na `main`, o check passa e o deploy sai. Na AWS, nenhum usuário do IAM com chave para o CI. No GitHub, nenhum secret da AWS, só o ARN de um papel que não serve para nada fora do environment de produção deste repositório.
+## Quando dá erro
+
+- **"Not authorized to perform sts:AssumeRoleWithWebIdentity":** o token não passou na política. Quase sempre é o `sub`: o job não está no environment certo, o formato imutável não foi ligado no repositório, ou os ids estão errados.
+- **O `configure-aws-credentials` não consegue credenciais:** falta o `id-token: write` nas permissões do job.
+- **O deploy tenta criar tudo do zero:** o CI está numa região diferente da que o app usa.
+
+## Resumo
+
+- Um provedor OIDC por conta da AWS.
+- Um papel por app, que só confia no environment `production` do repositório, com o `sub` imutável.
+- O environment `production` restrito à `main`.
+- No workflow: `environment: production`, `id-token: write` e o `configure-aws-credentials` com o ARN do papel.
+
+No fim, nenhum secret da AWS no GitHub e nenhum usuário do IAM com chave para o CI. Só o ARN de um papel que não serve para nada fora do deploy de produção daquele repositório.
