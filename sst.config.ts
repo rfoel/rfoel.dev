@@ -29,8 +29,11 @@ export default $config({
         command: "vp run build",
         output: "dist",
       },
-      // Endereço que não existe: a 404.html (prerender.mjs) com status 404, em vez da home
-      errorPage: "404.html",
+      // Endereço que não existe: a 404.html (prerender.mjs, com noindex) em vez da home. É o
+      // indexPage, que a função do CloudFront serve com status 200, e não o errorPage: sem Router,
+      // o CloudFront busca a página de erro na origem fixa da distribuição, que no SST é só um
+      // placeholder, e responde 502.
+      indexPage: "404.html",
       domain: isProd ? "rfoel.dev" : undefined,
     });
 
