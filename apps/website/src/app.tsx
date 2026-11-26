@@ -1,4 +1,6 @@
 import type { CSSProperties } from "react";
+import { PostList } from "./blog/pages.tsx";
+import { POSTS } from "./blog/posts.ts";
 import { Contact } from "./contact.tsx";
 import { Monogram } from "./monogram.tsx";
 import { track } from "./pegada.ts";
@@ -48,6 +50,12 @@ export function App() {
               Contato
             </a>
             <a
+              href="/blog/"
+              className="rounded-full px-5 py-2.5 text-sm font-medium ring-1 ring-(--line) transition hover:ring-(--muted)"
+            >
+              Blog
+            </a>
+            <a
               href="https://github.com/rfoel"
               onClick={() => track("github_aberto", { origem: "topo" })}
               className="rounded-full px-5 py-2.5 text-sm font-medium ring-1 ring-(--line) transition hover:ring-(--muted)"
@@ -76,6 +84,18 @@ export function App() {
           <ProjectPanel key={project.slug} project={project} index={index} />
         ))}
       </main>
+
+      <section className="border-t border-(--line) py-16 sm:py-24">
+        <div className="mb-8 flex items-end justify-between gap-6">
+          <h2 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
+            Do blog
+          </h2>
+          <a href="/blog/" className="text-sm font-medium text-(--muted) hover:text-(--fg)">
+            Todos os posts →
+          </a>
+        </div>
+        <PostList posts={POSTS.slice(0, 3)} />
+      </section>
 
       <Contact />
 

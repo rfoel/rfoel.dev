@@ -13,10 +13,12 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
+    "marked": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "~5.9.3",
     "vite": "catalog:",

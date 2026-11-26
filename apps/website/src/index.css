@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 @theme {
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
@@ -60,4 +61,36 @@ html {
   .animate-rise {
     animation: none;
   }
+}
+
+/* Texto dos posts do blog (src/blog/pages.tsx) */
+.post :where(h2, h3) {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.post .lede {
+  font-size: 1.2em;
+  color: var(--muted);
+}
+.post pre {
+  border-radius: 0.9rem;
+}
+.post img {
+  border-radius: 0.9rem;
+  box-shadow: 0 0 0 1px var(--line);
+}
+.post .table-scroll {
+  overflow-x: auto;
+}
+/* Código em linha: sem as crases que o plugin de tipografia acrescenta, com um fundo leve */
+.post :where(code):not(:where(pre code))::before,
+.post :where(code):not(:where(pre code))::after {
+  content: none;
+}
+.post :where(code):not(:where(pre code)) {
+  padding: 0.15em 0.4em;
+  border-radius: 0.4em;
+  background: color-mix(in srgb, var(--fg) 7%, transparent);
+  font-weight: 500;
 }

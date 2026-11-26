@@ -1,14 +1,27 @@
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
 import { App } from "./app.tsx";
+import { postHtml } from "./blog/bodies.ts";
+import { BlogIndex, PostPage } from "./blog/pages.tsx";
+import { POSTS } from "./blog/posts.ts";
 
-// Render da página no build (ver prerender.mjs), para o conteúdo já vir no HTML:
+// Render das páginas no build (ver prerender.mjs), para o conteúdo já vir no HTML:
 // aparece antes do JavaScript e chega a robôs que não rodam JavaScript.
-// No navegador, main.tsx hidrata em cima dele.
+// A home é hidratada no navegador (main.tsx); as páginas do blog ficam só em HTML.
+export { POSTS };
+
 export function render(): string {
   return renderToString(
     <StrictMode>
       <App />
     </StrictMode>,
   );
+}
+
+export const renderBlogIndex = (): string => renderToString(<BlogIndex />);
+
+export function renderPost(slug: string): string {
+  const post = POSTS.find((p) => p.slug === slug);
+  if (!post) throw new Error(`Post desconhecido: ${slug}`);
+  return renderToString(<PostPage post={post} html={postHtml(slug)} />);
 }
