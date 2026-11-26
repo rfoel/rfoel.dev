@@ -34,7 +34,7 @@ export function App() {
       <section className="grid items-center gap-8 pt-10 pb-16 sm:pt-16 lg:min-h-[78vh] lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-12 lg:py-12">
         <div>
           <p className="font-mono text-sm text-(--muted)">Oi, eu sou</p>
-          <h1 className="mt-3 text-6xl leading-[0.95] font-semibold tracking-tighter sm:text-8xl">
+          <h1 className="mt-3 font-display text-6xl leading-[0.9] font-extrabold tracking-tight sm:text-8xl">
             Rafael Franco
           </h1>
           <p className="mt-8 text-2xl leading-snug font-medium tracking-tight sm:text-3xl">
@@ -79,7 +79,9 @@ export function App() {
       </section>
 
       <div className="mb-8 flex items-end justify-between gap-6 border-t border-(--line) pt-10">
-        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Uma amostra</h2>
+        <h2 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
+          Uma amostra
+        </h2>
         <p className="hidden max-w-xs text-right text-sm text-(--muted) sm:block">
           Projetos que eu criei sozinho e que estão no ar. Dá para abrir e usar.
         </p>
@@ -125,7 +127,7 @@ function ProjectPanel({ project, index }: { project: Project; index: number }) {
         </div>
 
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
             <a href={project.url} className="hover:text-(--p-accent)">
               {project.name}
             </a>
