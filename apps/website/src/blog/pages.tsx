@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 import { POSTS } from "./posts.ts";
 import { formatDate, PROJECTS, type PostMeta } from "./types.ts";
 
-// Páginas do blog: saem prontas do build (prerender.mjs) e não carregam o JavaScript do site.
+// Páginas do blog (e a 404): saem prontas do build (prerender.mjs) e não carregam o JavaScript do site.
 
-function Layout({ children }: { children: ReactNode }) {
+export function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-8">
       <header className="py-8">
@@ -111,17 +111,19 @@ export function PostPage({ post, html }: { post: PostMeta; html: string }) {
           dangerouslySetInnerHTML={{ __html: html }}
         />
 
-        <p className="mt-16 rounded-2xl p-5 text-sm text-(--muted) ring-1 ring-(--line)">
-          Publicado originalmente{" "}
-          <a
-            href={post.original}
-            className="font-medium text-(--fg) underline decoration-2 underline-offset-4"
-            style={{ textDecorationColor: project.color }}
-          >
-            {project.blog} ↗
-          </a>
-          .
-        </p>
+        {post.original ? (
+          <p className="mt-16 rounded-2xl p-5 text-sm text-(--muted) ring-1 ring-(--line)">
+            Publicado originalmente{" "}
+            <a
+              href={post.original}
+              className="font-medium text-(--fg) underline decoration-2 underline-offset-4"
+              style={{ textDecorationColor: project.color }}
+            >
+              {project.blog} ↗
+            </a>
+            .
+          </p>
+        ) : null}
 
         <nav className="mt-12 grid gap-4 sm:grid-cols-2" aria-label="Outros posts">
           {older ? <Neighbor post={older} label="← Anterior" /> : <span />}

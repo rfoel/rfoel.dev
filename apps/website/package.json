@@ -9,16 +9,24 @@
     "preview": "vp preview"
   },
   "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "catalog:",
+    "@fontsource-variable/geist": "catalog:",
+    "@fontsource-variable/geist-mono": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@fontsource/bricolage-grotesque": "catalog:",
+    "@fontsource/geist": "catalog:",
+    "@fontsource/geist-mono": "catalog:",
+    "@resvg/resvg-js": "catalog:",
     "@tailwindcss/typography": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "marked": "catalog:",
+    "satori": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "~5.9.3",
     "vite": "catalog:",

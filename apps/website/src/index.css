@@ -1,10 +1,15 @@
 @import "tailwindcss";
+/* Fontes servidas pelo próprio site (sem Google Fonts): a Bricolage com o eixo de tamanho óptico */
+@import "@fontsource-variable/bricolage-grotesque/opsz.css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
-  --font-display: "Bricolage Grotesque", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, monospace;
+  --font-display:
+    "Bricolage Grotesque Variable", "Geist Variable", ui-sans-serif, system-ui, sans-serif;
   --animate-rise: rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 
   @keyframes rise {

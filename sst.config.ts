@@ -29,6 +29,8 @@ export default $config({
         command: "vp run build",
         output: "dist",
       },
+      // Endereço que não existe: a 404.html (prerender.mjs) com status 404, em vez da home
+      errorPage: "404.html",
       domain: isProd ? "rfoel.dev" : undefined,
     });
 
