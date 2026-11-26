@@ -1,0 +1,59 @@
+# A cada push na main: confere o código (formato, lint e tipos) e o build, e faz o deploy de produção.
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      # Instala o vp, o Node e as dependências (vp install)
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      # Os tipos do sst.config.ts (.sst/platform) só existem depois do sst install
+      - run: vp exec sst install
+
+      # Erro de formato, lint, tipo ou build para tudo antes do deploy
+      - run: vp check
+      - run: vp run build
+        working-directory: apps/website
+
+  # Deploy de produção depois do check. O job roda no environment "production" (só a main),
+  # o único sujeito em que o DeployRole do sst.config.ts confia.
+  deploy:
+    name: Deploy de produção
+    needs: check
+    # Desligado até existir a variável AWS_DEPLOY_ROLE: o DeployRole sai do primeiro deploy feito à mão
+    if: vars.AWS_DEPLOY_ROLE != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    # Um deploy por vez; um push mais novo espera em vez de cancelar um pela metade
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE }}
+          aws-region: us-east-1
+
+      - run: vp exec sst deploy --stage production
