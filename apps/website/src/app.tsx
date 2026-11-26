@@ -1,37 +1,18 @@
 import type { CSSProperties } from "react";
+import { Contact } from "./contact.tsx";
 import { Monogram } from "./monogram.tsx";
+import { track } from "./pegada.ts";
 import { type Project, projects } from "./projects.ts";
 import { Rotator } from "./rotator.tsx";
+
+// Para o evento projeto_aberto: para onde o link leva
+const destination = (href: string) =>
+  href.includes("github.com") ? "github" : href.includes("npmjs.com") ? "npm" : "site";
 
 export function App() {
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-8">
-      <header className="flex items-center justify-between py-6">
-        <a
-          href="/"
-          className="flex items-center gap-3 font-medium"
-          aria-label="Rafael Franco, início"
-        >
-          <img
-            src="/favicon.svg"
-            alt=""
-            width={32}
-            height={32}
-            className="size-8 rounded-md dark:invert"
-          />
-          <span>Rafael Franco</span>
-        </a>
-        <nav className="flex gap-5 text-sm text-(--muted)">
-          <a href="#projetos" className="hover:text-(--fg)">
-            Projetos
-          </a>
-          <a href="https://github.com/rfoel" className="hover:text-(--fg)">
-            GitHub
-          </a>
-        </nav>
-      </header>
-
-      <section className="grid items-center gap-8 pt-10 pb-16 sm:pt-16 lg:min-h-[78vh] lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-12 lg:py-12">
+      <section className="grid items-center gap-8 pt-16 pb-16 sm:pt-24 lg:min-h-[88vh] lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-12 lg:py-12">
         <div>
           <p className="font-mono text-sm text-(--muted)">Oi, eu sou</p>
           <h1 className="mt-3 font-display text-6xl leading-[0.9] font-extrabold tracking-tight sm:text-8xl">
@@ -61,7 +42,14 @@ export function App() {
               Ver trabalhos ↓
             </a>
             <a
+              href="#contato"
+              className="rounded-full px-5 py-2.5 text-sm font-medium ring-1 ring-(--line) transition hover:ring-(--muted)"
+            >
+              Contato
+            </a>
+            <a
               href="https://github.com/rfoel"
+              onClick={() => track("github_aberto", { origem: "topo" })}
               className="rounded-full px-5 py-2.5 text-sm font-medium ring-1 ring-(--line) transition hover:ring-(--muted)"
             >
               GitHub ↗
@@ -71,10 +59,6 @@ export function App() {
 
         <div className="relative mx-auto w-full max-w-[360px] sm:max-w-[460px] lg:max-w-none">
           <Monogram className="w-full" />
-          <p className="mt-2 text-center font-mono text-xs text-(--muted)">
-            <span className="pointer-coarse:hidden">passe o mouse · clique para espalhar</span>
-            <span className="hidden pointer-coarse:inline">toque para espalhar</span>
-          </p>
         </div>
       </section>
 
@@ -93,9 +77,15 @@ export function App() {
         ))}
       </main>
 
+      <Contact />
+
       <footer className="flex flex-col gap-2 border-t border-(--line) py-8 text-sm text-(--muted) sm:flex-row sm:justify-between">
         <span suppressHydrationWarning>© {new Date().getFullYear()} Rafael Franco</span>
-        <a href="https://github.com/rfoel" className="hover:text-(--fg)">
+        <a
+          href="https://github.com/rfoel"
+          onClick={() => track("github_aberto", { origem: "rodape" })}
+          className="hover:text-(--fg)"
+        >
           github.com/rfoel
         </a>
       </footer>
@@ -128,7 +118,11 @@ function ProjectPanel({ project, index }: { project: Project; index: number }) {
 
         <div>
           <h2 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
-            <a href={project.url} className="hover:text-(--p-accent)">
+            <a
+              href={project.url}
+              onClick={() => track("projeto_aberto", { projeto: project.slug, destino: "site" })}
+              className="hover:text-(--p-accent)"
+            >
               {project.name}
             </a>
           </h2>
@@ -162,6 +156,9 @@ function ProjectPanel({ project, index }: { project: Project; index: number }) {
             <a
               key={link.href}
               href={link.href}
+              onClick={() =>
+                track("projeto_aberto", { projeto: project.slug, destino: destination(link.href) })
+              }
               className="inline-flex items-center gap-1 font-medium underline decoration-(--p-accent) decoration-2 underline-offset-4 hover:text-(--p-accent)"
             >
               {link.label}

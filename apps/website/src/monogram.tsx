@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { track } from "./pegada.ts";
 
 // O "R" do favicon (viewBox 256), desenhado com partículas.
 const PATHS = [
@@ -167,8 +168,14 @@ export function Monogram({ className }: { className?: string }) {
       if (event.pointerType !== "mouse") onLeave();
     };
     // Clique espalha tudo, e as partículas voltam sozinhas
+    let tracked = 0;
     const onDown = (event: PointerEvent) => {
       onMove(event);
+      // Conta quem brinca com o R, no máximo um evento a cada 2 s
+      if (event.timeStamp - tracked > 2000 || !tracked) {
+        tracked = event.timeStamp;
+        track("monograma_espalhado");
+      }
       for (const p of particles) {
         const angle = Math.atan2(p.y - pointer.y, p.x - pointer.x) + (Math.random() - 0.5);
         const speed = 8 + Math.random() * 18;
