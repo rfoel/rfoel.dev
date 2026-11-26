@@ -23,17 +23,31 @@ export default $config({
   async run() {
     const isProd = $app.stage === "production";
 
+    // Os posts do blog (um .md por post), para a função do CloudFront saber quais endereços
+    // existem. Lidos da pasta, e não importando o posts.ts: importar ele muda o código que o SST
+    // empacota com os seus providers e faz o deploy recriar os registros de DNS do domínio.
+    const { readdirSync } = await import("node:fs");
+    const slugs = readdirSync("apps/website/src/blog/posts")
+      .filter((file) => file.endsWith(".md"))
+      .map((file) => file.slice(0, -".md".length));
+    const { notFoundEdge } = await import("./infra/not-found.ts");
+    const notFound = notFoundEdge(slugs);
+
     const site = new sst.aws.StaticSite("Website", {
       path: "apps/website",
       build: {
         command: "vp run build",
         output: "dist",
       },
-      // Endereço que não existe: a 404.html (prerender.mjs, com noindex) em vez da home. É o
-      // indexPage, que a função do CloudFront serve com status 200, e não o errorPage: sem Router,
-      // o CloudFront busca a página de erro na origem fixa da distribuição, que no SST é só um
-      // placeholder, e responde 502.
+      // Endereço que não existe: a 404.html (prerender.mjs, com noindex). É o indexPage, e não o
+      // errorPage: sem Router, o CloudFront busca a página de erro na origem fixa da distribuição,
+      // que no SST é só um placeholder, e responde 502. O status 404 e os endereços dentro de
+      // /blog, que o SST manda direto para o S3, ficam com as funções abaixo (infra/not-found.ts).
       indexPage: "404.html",
+      edge: {
+        viewerRequest: { injection: notFound.request },
+        viewerResponse: { injection: notFound.response },
+      },
       domain: isProd ? "rfoel.dev" : undefined,
     });
 
