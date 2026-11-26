@@ -26,7 +26,7 @@ const setMeta = (html, attr, key, value) => {
 };
 
 // Uma página do blog: título, descrição e endereço próprios, sem o JavaScript da home
-function page({ body, title, description, url, canonical, type = "website", published }) {
+function page({ body, title, description, url, type = "website", published }) {
   let html = template
     .replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
     .replace(/\s*<script type="module"[^>]*><\/script>/g, "")
@@ -37,7 +37,7 @@ function page({ body, title, description, url, canonical, type = "website", publ
   html = setMeta(html, "property", "og:description", description);
   html = setMeta(html, "property", "og:url", url);
   html = setMeta(html, "property", "og:type", type);
-  const extra = [`<link rel="canonical" href="${esc(canonical ?? url)}" />`];
+  const extra = [`<link rel="canonical" href="${esc(url)}" />`];
   if (published) extra.push(`<meta property="article:published_time" content="${published}" />`);
   return html.replace("</head>", `    ${extra.join("\n    ")}\n  </head>`);
 }
@@ -74,8 +74,6 @@ for (const post of POSTS) {
       title: `${post.title} — Rafael Franco`,
       description: post.description,
       url: `${SITE}/blog/${post.slug}/`,
-      // O post saiu primeiro no blog do projeto: é lá que buscadores devem indexar
-      canonical: post.original,
       type: "article",
       published: post.date,
     }),

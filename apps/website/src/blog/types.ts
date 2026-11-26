@@ -10,7 +10,7 @@ export interface PostMeta {
   project: ProjectId;
   title: string;
   description: string;
-  /** Onde o post saiu primeiro (vira o canonical da página) */
+  /** Onde o post saiu primeiro (link no fim do post) */
   original: string;
 }
 
